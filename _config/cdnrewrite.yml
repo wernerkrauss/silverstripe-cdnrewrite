@@ -1,0 +1,9 @@
+---
+Name: cdnrewrite
+After: 'framework/*','cms/*'
+---
+Injector:
+  RequestProcessor:
+    properties:
+      filters:
+        - '%$CDNRewriteRequestFilter'

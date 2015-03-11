@@ -1,0 +1,28 @@
+{
+	"name": "wernerkrauss/cdnrewrite",
+	"description": "Rewrites all links for assets to use a cdn instead",
+	"type": "silverstripe-module",
+	"keywords": ["silverstripe", "extension"],
+	"license": "MIT",
+	"authors": [
+	{
+		"name": "Werner Krauß",
+		"email": "werner.krauss@netwerkstatt.at",
+		"homepage": "http://www.netwerkstatt.at",
+		"role": "Developer"
+	}
+	],
+	"support": {
+		"issues": "https://github.com/wernerkrauss/silverstripe-cdnrewrite/issues"
+	},
+	"require": {
+		"silverstripe/framework": "3.*",
+		"silverstripe/cms": "3.*",
+		"composer/installers": "*"
+	},
+	"suggest": {
+	},
+	"extra": {
+		"installer-name": "cdnrewrite"
+	}
+}
