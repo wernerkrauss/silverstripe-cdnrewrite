@@ -15,6 +15,18 @@ class CDNRewriteRequestFilter implements RequestFilter {
 	private static $cdn_domain = 'http://cdn.mysite.com';
 
 	/**
+	 * Enable rewrite in admin area
+	 * @var bool
+	 */
+	private static $enable_in_backend = false;
+
+	/**
+	 * Enable rewrite in dev mode
+	 * @var bool
+	 */
+	private static $enable_in_dev = false;
+
+	/**
 	 * Filter executed before a request processes
 	 *
 	 * @param SS_HTTPRequest $request Request container object
@@ -24,6 +36,7 @@ class CDNRewriteRequestFilter implements RequestFilter {
 	 */
 	public function preRequest(SS_HTTPRequest $request, Session $session, DataModel $model)
 	{
+
 		return true;
 	}
 
@@ -37,11 +50,7 @@ class CDNRewriteRequestFilter implements RequestFilter {
 	 */
 	public function postRequest(SS_HTTPRequest $request, SS_HTTPResponse $response, DataModel $model)
 	{
-		if (!Config::inst()->get('CDNRewriteRequestFilter', 'cdn_rewrite')) {
-			return true;
-		}
-
-		if (Versioned::current_stage() == 'dev') {
+		if (!self::isEnabled()) {
 			return true;
 		}
 
@@ -50,6 +59,28 @@ class CDNRewriteRequestFilter implements RequestFilter {
 		return true;
 
 	}
+
+	/**
+	 * Checks if cdn rewrite is enabled
+	 * @return bool
+	 */
+	static function isEnabled() {
+		$general = Config::inst()->get('CDNRewriteRequestFilter', 'cdn_rewrite');
+		$dev = !Director::isDev() || Config::inst()->get('CDNRewriteRequestFilter', 'enable_in_dev');
+		$backend = !self::isBackend() ||  Config::inst()->get('CDNRewriteRequestFilter', 'enable_in_backend');
+
+		return $general && $dev && $backend;
+	}
+
+	/**
+	 * Helper method to check if we're in backend (LeftAndMain) or frontend
+	 * Controller::curr() doesn't return anything, so i cannot check it...
+	 * @return bool
+	 */
+	static function isBackend() {
+		return !Config::inst()->get('SSViewer', 'theme_enabled') || strpos($_GET['url'], 'admin') === 1;
+	}
+
 
 	/**
 	 * replaces links to assets in src and href attributes to point to a given cdn domain
