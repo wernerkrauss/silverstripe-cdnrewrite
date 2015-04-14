@@ -36,7 +36,6 @@ class CDNRewriteRequestFilter implements RequestFilter {
 	 */
 	public function preRequest(SS_HTTPRequest $request, Session $session, DataModel $model)
 	{
-
 		return true;
 	}
 
@@ -66,10 +65,10 @@ class CDNRewriteRequestFilter implements RequestFilter {
 	 */
 	static function isEnabled() {
 		$general = Config::inst()->get('CDNRewriteRequestFilter', 'cdn_rewrite');
-		$dev = !Director::isDev() || Config::inst()->get('CDNRewriteRequestFilter', 'enable_in_dev');
-		$backend = !self::isBackend() ||  Config::inst()->get('CDNRewriteRequestFilter', 'enable_in_backend');
+		$notDev = !Director::isDev() || Config::inst()->get('CDNRewriteRequestFilter', 'enable_in_dev');
+		$notBackend = !self::isBackend() ||  Config::inst()->get('CDNRewriteRequestFilter', 'enable_in_backend');
 
-		return $general && $dev && $backend;
+		return $general && $notDev && $notBackend;
 	}
 
 	/**
@@ -92,7 +91,6 @@ class CDNRewriteRequestFilter implements RequestFilter {
 	{
 		$cdn = Config::inst()->get('CDNRewriteRequestFilter','cdn_domain');
 
-
 		$body = str_replace('src="/assets/', 'src="' . $cdn . '/assets/', $body);
 		$body = str_replace('src=\"/assets/', 'src=\"' . $cdn . '/assets/', $body);
 		$body = str_replace('href="/assets/', 'href="' . $cdn . '/assets/', $body);
@@ -100,5 +98,4 @@ class CDNRewriteRequestFilter implements RequestFilter {
 
 		return $body;
 	}
-
 }
