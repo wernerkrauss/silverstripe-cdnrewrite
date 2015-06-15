@@ -55,15 +55,16 @@ class CDNRewriteRequestFilter implements RequestFilter {
 
 		$body = $response->getBody();
 		$response->setBody(self::replaceCDN($body));
-		return true;
 
+		return true;
 	}
 
 	/**
 	 * Checks if cdn rewrite is enabled
 	 * @return bool
 	 */
-	static function isEnabled() {
+	static function isEnabled()
+	{
 		$general = Config::inst()->get('CDNRewriteRequestFilter', 'cdn_rewrite');
 		$notDev = !Director::isDev() || Config::inst()->get('CDNRewriteRequestFilter', 'enable_in_dev');
 		$notBackend = !self::isBackend() ||  Config::inst()->get('CDNRewriteRequestFilter', 'enable_in_backend');
@@ -76,10 +77,10 @@ class CDNRewriteRequestFilter implements RequestFilter {
 	 * Controller::curr() doesn't return anything, so i cannot check it...
 	 * @return bool
 	 */
-	static function isBackend() {
+	static function isBackend()
+	{
 		return !Config::inst()->get('SSViewer', 'theme_enabled') || strpos($_GET['url'], 'admin') === 1;
 	}
-
 
 	/**
 	 * replaces links to assets in src and href attributes to point to a given cdn domain
@@ -91,10 +92,18 @@ class CDNRewriteRequestFilter implements RequestFilter {
 	{
 		$cdn = Config::inst()->get('CDNRewriteRequestFilter','cdn_domain');
 
+		$body = str_replace('src="assets/', 'src="' . $cdn . '/assets/', $body);
 		$body = str_replace('src="/assets/', 'src="' . $cdn . '/assets/', $body);
 		$body = str_replace('src=\"/assets/', 'src=\"' . $cdn . '/assets/', $body);
+
 		$body = str_replace('href="/assets/', 'href="' . $cdn . '/assets/', $body);
 		$body = str_replace(Director::absoluteBaseURL() . 'assets/', $cdn . '/assets/', $body);
+
+		$body = str_replace('src="/themes/', 'src="' . $cdn . '/themes/', $body);
+		$body = str_replace('src="' . Director::absoluteBaseURL() . 'themes/', 'src="' . $cdn . '/themes/', $body);
+
+		$body = str_replace('href="/themes/', 'href="' . $cdn . '/themes/', $body);
+		$body = str_replace('href="' . Director::absoluteBaseURL() . 'themes/', 'href="' . $cdn . '/themes/', $body);
 
 		return $body;
 	}
