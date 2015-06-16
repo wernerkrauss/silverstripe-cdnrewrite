@@ -34,8 +34,7 @@ class CDNRewriteRequestFilter implements RequestFilter {
 	 * @param DataModel $model Current DataModel
 	 * @return boolean Whether to continue processing other filters. Null or true will continue processing (optional)
 	 */
-	public function preRequest(SS_HTTPRequest $request, Session $session, DataModel $model)
-	{
+	public function preRequest(SS_HTTPRequest $request, Session $session, DataModel $model) {
 		return true;
 	}
 
@@ -47,8 +46,7 @@ class CDNRewriteRequestFilter implements RequestFilter {
 	 * @param DataModel $model Current DataModel
 	 * @return boolean Whether to continue processing other filters. Null or true will continue processing (optional)
 	 */
-	public function postRequest(SS_HTTPRequest $request, SS_HTTPResponse $response, DataModel $model)
-	{
+	public function postRequest(SS_HTTPRequest $request, SS_HTTPResponse $response, DataModel $model) {
 		if (!self::isEnabled()) {
 			return true;
 		}
@@ -63,8 +61,7 @@ class CDNRewriteRequestFilter implements RequestFilter {
 	 * Checks if cdn rewrite is enabled
 	 * @return bool
 	 */
-	static function isEnabled()
-	{
+	static function isEnabled() {
 		$general = Config::inst()->get('CDNRewriteRequestFilter', 'cdn_rewrite');
 		$notDev = !Director::isDev() || Config::inst()->get('CDNRewriteRequestFilter', 'enable_in_dev');
 		$notBackend = !self::isBackend() ||  Config::inst()->get('CDNRewriteRequestFilter', 'enable_in_backend');
@@ -77,8 +74,7 @@ class CDNRewriteRequestFilter implements RequestFilter {
 	 * Controller::curr() doesn't return anything, so i cannot check it...
 	 * @return bool
 	 */
-	static function isBackend()
-	{
+	static function isBackend() {
 		return !Config::inst()->get('SSViewer', 'theme_enabled') || strpos($_GET['url'], 'admin') === 1;
 	}
 
@@ -88,8 +84,7 @@ class CDNRewriteRequestFilter implements RequestFilter {
 	 * @param $body
 	 * @return mixed|void
 	 */
-	static function replaceCDN($body)
-	{
+	static function replaceCDN($body) {
 		$cdn = Config::inst()->get('CDNRewriteRequestFilter','cdn_domain');
 
 		$body = str_replace('src="assets/', 'src="' . $cdn . '/assets/', $body);
