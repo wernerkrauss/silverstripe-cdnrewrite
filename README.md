@@ -21,7 +21,9 @@ Your config.yml might look like:
 
 ```yml
 CDNRewriteRequestFilter:
-  cdn_rewrite: true
+  cdn_rewrite: true #global switch
   cdn_domain: 'http://cdn.mydomain.com'
+  rewrite_assets: true  #rewrite stuff in assets
+  rewrite_themes: false #do not rewrite stuff in themes folder
 ```
 

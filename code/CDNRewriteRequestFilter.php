@@ -26,6 +26,19 @@ class CDNRewriteRequestFilter implements RequestFilter {
 	 */
 	private static $enable_in_dev = false;
 
+
+	/**
+	 * should assets be rewritten?
+	 * @var bool
+	 */
+	private static $rewrite_assets = true;
+
+	/**
+	 * should themes also be rewritten?
+	 * @var bool
+	 */
+	private static $rewrite_themes = false;
+
 	/**
 	 * Filter executed before a request processes
 	 *
@@ -34,8 +47,7 @@ class CDNRewriteRequestFilter implements RequestFilter {
 	 * @param DataModel $model Current DataModel
 	 * @return boolean Whether to continue processing other filters. Null or true will continue processing (optional)
 	 */
-	public function preRequest(SS_HTTPRequest $request, Session $session, DataModel $model)
-	{
+	public function preRequest(SS_HTTPRequest $request, Session $session, DataModel $model) {
 		return true;
 	}
 
@@ -47,16 +59,15 @@ class CDNRewriteRequestFilter implements RequestFilter {
 	 * @param DataModel $model Current DataModel
 	 * @return boolean Whether to continue processing other filters. Null or true will continue processing (optional)
 	 */
-	public function postRequest(SS_HTTPRequest $request, SS_HTTPResponse $response, DataModel $model)
-	{
+	public function postRequest(SS_HTTPRequest $request, SS_HTTPResponse $response, DataModel $model) {
 		if (!self::isEnabled()) {
 			return true;
 		}
 
 		$body = $response->getBody();
 		$response->setBody(self::replaceCDN($body));
-		return true;
 
+		return true;
 	}
 
 	/**
@@ -81,21 +92,31 @@ class CDNRewriteRequestFilter implements RequestFilter {
 		return !Config::inst()->get('SSViewer', 'theme_enabled') || strpos($url, 'admin') === 1;
 	}
 
-
 	/**
 	 * replaces links to assets in src and href attributes to point to a given cdn domain
 	 *
 	 * @param $body
 	 * @return mixed|void
 	 */
-	static function replaceCDN($body)
-	{
+	static function replaceCDN($body) {
 		$cdn = Config::inst()->get('CDNRewriteRequestFilter','cdn_domain');
 
-		$body = str_replace('src="/assets/', 'src="' . $cdn . '/assets/', $body);
-		$body = str_replace('src=\"/assets/', 'src=\"' . $cdn . '/assets/', $body);
-		$body = str_replace('href="/assets/', 'href="' . $cdn . '/assets/', $body);
-		$body = str_replace(Director::absoluteBaseURL() . 'assets/', $cdn . '/assets/', $body);
+		if (Config::inst()->get('CDNRewriteRequestFilter', 'rewrite_assets')) {
+			$body = str_replace('src="assets/', 'src="' . $cdn . '/assets/', $body);
+			$body = str_replace('src="/assets/', 'src="' . $cdn . '/assets/', $body);
+			$body = str_replace('src=\"/assets/', 'src=\"' . $cdn . '/assets/', $body);
+
+			$body = str_replace('href="/assets/', 'href="' . $cdn . '/assets/', $body);
+			$body = str_replace(Director::absoluteBaseURL() . 'assets/', $cdn . '/assets/', $body);
+		}
+
+		if (Config::inst()->get('CDNRewriteRequestFilter', 'rewrite_themes')) {
+			$body = str_replace('src="/themes/', 'src="' . $cdn . '/themes/', $body);
+			$body = str_replace('src="' . Director::absoluteBaseURL() . 'themes/', 'src="' . $cdn . '/themes/', $body);
+
+			$body = str_replace('href="/themes/', 'href="' . $cdn . '/themes/', $body);
+			$body = str_replace('href="' . Director::absoluteBaseURL() . 'themes/', 'href="' . $cdn . '/themes/', $body);
+		}
 
 		return $body;
 	}
