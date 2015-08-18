@@ -77,7 +77,8 @@ class CDNRewriteRequestFilter implements RequestFilter {
 	 * @return bool
 	 */
 	static function isBackend() {
-		return !Config::inst()->get('SSViewer', 'theme_enabled') || strpos($_GET['url'], 'admin') === 1;
+		$url = array_key_exists('url', $_GET) ? $_GET['url'] : '';
+		return !Config::inst()->get('SSViewer', 'theme_enabled') || strpos($url, 'admin') === 1;
 	}
 
 
