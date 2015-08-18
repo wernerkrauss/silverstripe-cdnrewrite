@@ -26,6 +26,19 @@ class CDNRewriteRequestFilter implements RequestFilter {
 	 */
 	private static $enable_in_dev = false;
 
+
+	/**
+	 * should assets be rewritten?
+	 * @var bool
+	 */
+	private static $rewrite_assets = true;
+
+	/**
+	 * should themes also be rewritten?
+	 * @var bool
+	 */
+	private static $rewrite_themes = false;
+
 	/**
 	 * Filter executed before a request processes
 	 *
@@ -87,18 +100,22 @@ class CDNRewriteRequestFilter implements RequestFilter {
 	static function replaceCDN($body) {
 		$cdn = Config::inst()->get('CDNRewriteRequestFilter','cdn_domain');
 
-		$body = str_replace('src="assets/', 'src="' . $cdn . '/assets/', $body);
-		$body = str_replace('src="/assets/', 'src="' . $cdn . '/assets/', $body);
-		$body = str_replace('src=\"/assets/', 'src=\"' . $cdn . '/assets/', $body);
+		if (Config::inst()->get('CDNRewriteRequestFilter', 'rewrite_assets')) {
+			$body = str_replace('src="assets/', 'src="' . $cdn . '/assets/', $body);
+			$body = str_replace('src="/assets/', 'src="' . $cdn . '/assets/', $body);
+			$body = str_replace('src=\"/assets/', 'src=\"' . $cdn . '/assets/', $body);
 
-		$body = str_replace('href="/assets/', 'href="' . $cdn . '/assets/', $body);
-		$body = str_replace(Director::absoluteBaseURL() . 'assets/', $cdn . '/assets/', $body);
+			$body = str_replace('href="/assets/', 'href="' . $cdn . '/assets/', $body);
+			$body = str_replace(Director::absoluteBaseURL() . 'assets/', $cdn . '/assets/', $body);
+		}
 
-		$body = str_replace('src="/themes/', 'src="' . $cdn . '/themes/', $body);
-		$body = str_replace('src="' . Director::absoluteBaseURL() . 'themes/', 'src="' . $cdn . '/themes/', $body);
+		if (Config::inst()->get('CDNRewriteRequestFilter', 'rewrite_themes')) {
+			$body = str_replace('src="/themes/', 'src="' . $cdn . '/themes/', $body);
+			$body = str_replace('src="' . Director::absoluteBaseURL() . 'themes/', 'src="' . $cdn . '/themes/', $body);
 
-		$body = str_replace('href="/themes/', 'href="' . $cdn . '/themes/', $body);
-		$body = str_replace('href="' . Director::absoluteBaseURL() . 'themes/', 'href="' . $cdn . '/themes/', $body);
+			$body = str_replace('href="/themes/', 'href="' . $cdn . '/themes/', $body);
+			$body = str_replace('href="' . Director::absoluteBaseURL() . 'themes/', 'href="' . $cdn . '/themes/', $body);
+		}
 
 		return $body;
 	}
